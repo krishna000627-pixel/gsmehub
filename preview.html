@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gamehub v1 preview</title>
+<style>
+  :root{
+    --bg:#0e1015; --c1:#14161c; --c2:#191b22; --c3:#23252d; --c4:#2d2f38;
+    --pri:#b4beff; --onpri:#16206b; --pc:#2e3a8c; --onpc:#dde0ff;
+    --tx:#e3e2e9; --tv:#c6c5d0; --ol:#90909a;
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box;margin:0}
+  body{background:#07080b;color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:32px 16px 56px}
+  h1{font-size:26px;font-weight:650;text-align:center}
+  .sub{text-align:center;color:var(--tv);margin:6px 0 32px}
+  .row{display:flex;flex-wrap:wrap;gap:28px;justify-content:center}
+  figure{width:300px}
+  figcaption{text-align:center;color:var(--tv);margin-top:12px;font-size:13px}
+  .phone{position:relative;width:300px;height:620px;border-radius:36px;background:var(--bg);border:6px solid #1c1e26;overflow:hidden}
+  .scr{padding:44px 16px 0;height:100%}
+  .sb{position:absolute;top:10px;left:22px;right:22px;display:flex;justify-content:space-between;font-size:11px;color:var(--tv)}
+  h2{font-size:24px;font-weight:600;margin:6px 4px 12px}
+  .search{height:48px;border-radius:24px;background:var(--c3);display:flex;align-items:center;padding:0 16px;color:var(--ol);gap:10px;margin-bottom:16px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .card{background:var(--c2);border-radius:20px;padding:14px;height:128px}
+  .ic{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;font-weight:700;color:#fff;font-size:20px}
+  .card b{display:block;margin-top:12px;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .card small{color:var(--tv);font-size:11px}
+  .pin{float:right;width:10px;height:10px;border-radius:50%;background:var(--pri)}
+  .fab{position:absolute;right:16px;bottom:104px;height:52px;padding:0 20px;border-radius:16px;background:var(--pc);color:var(--onpc);display:flex;align-items:center;gap:8px;font-weight:600;box-shadow:0 8px 20px #0008}
+  .dock{position:absolute;left:50%;transform:translateX(-50%);bottom:18px;height:60px;border-radius:30px;background:var(--c3);padding:6px;display:flex;gap:4px;box-shadow:0 10px 24px #000a}
+  .dock span{height:48px;min-width:48px;border-radius:24px;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 14px;color:var(--tv);font-size:13px}
+  .dock .on{background:var(--pc);color:var(--onpc);padding:0 18px}
+  .meter{background:var(--c2);border-radius:20px;padding:18px}
+  .big{font-size:36px;font-weight:600}
+  .big em{font-style:normal;font-size:15px;color:var(--tv);margin-left:6px}
+  .chip{float:right;background:var(--pri);color:var(--onpri);border-radius:14px;padding:4px 12px;font-size:12px;margin-top:10px}
+  .track{position:relative;height:14px;border-radius:7px;background:var(--c4);margin:16px 0 10px}
+  .fill{position:absolute;inset:0 auto 0 0;width:62%;border-radius:7px;background:var(--pri)}
+  .th{position:absolute;top:0;bottom:0;left:32.5%;width:3px;background:var(--tx)}
+  .cap{font-size:12px;color:var(--tv)}
+  .lab{color:var(--pri);font-size:13px;font-weight:600;margin:18px 8px 8px}
+  .grp{background:var(--c2);border-radius:20px;overflow:hidden}
+  .li{min-height:56px;padding:8px 16px;display:flex;align-items:center;gap:12px}
+  .li div{flex:1;min-width:0}
+  .li b{display:block;font-weight:500;font-size:14px}
+  .li small{color:var(--tv);font-size:12px}
+  .sw{width:44px;height:26px;border-radius:13px;background:var(--c4);position:relative;flex:none}
+  .sw::after{content:"";position:absolute;top:4px;left:4px;width:18px;height:18px;border-radius:50%;background:var(--ol)}
+  .sw.on{background:var(--pri)}
+  .sw.on::after{left:22px;background:var(--onpri)}
+  .runner{background:#fff;height:100%;color:#111;padding:48px 20px}
+  .runner h3{font-size:22px;margin-bottom:10px}
+  .runner p{color:#555;font-size:13px}
+  .mini{position:absolute;right:10px;top:250px;display:flex;align-items:center;gap:6px}
+  .mini .pill{background:var(--c3);border-radius:24px;height:48px;display:flex;align-items:center;padding:0 6px;gap:2px;box-shadow:0 6px 16px #0007}
+  .mini .pill i{width:36px;height:36px;display:grid;place-items:center;font-style:normal;color:var(--tx)}
+  .mini .btn{width:48px;height:48px;border-radius:50%;background:var(--pc);display:grid;place-items:center;color:var(--onpc);font-size:20px;box-shadow:0 6px 16px #0007}
+</style>
+</head>
+<body>
+<h1>gamehub v1</h1>
+<p class="sub">Main screens. Dark first; light and dynamic color are in Settings.</p>
+<div class="row">
+
+<figure><div class="phone"><div class="sb"><span>9:41</span><span>5G 87%</span></div><div class="scr">
+  <h2>Library</h2>
+  <div class="search">&#9906; Search apps</div>
+  <div class="grid">
+    <div class="card"><div class="ic" style="background:#4a5bd0">Q</div><b>QuestBlock</b><small>Opened 5 min ago</small></div>
+    <div class="card"><span class="pin"></span><div class="ic" style="background:#2f8f83">T</div><b>Tip Calculator</b><small>Opened yesterday</small></div>
+    <div class="card"><div class="ic" style="background:#a0517e">P</div><b>Pomodoro Timer</b><small>Opened 3 d ago</small></div>
+    <div class="card"><div class="ic" style="background:#8a7a2e">N</div><b>Notes offline with a long name</b><small>Never opened</small></div>
+  </div>
+  <div class="fab">+ Import</div>
+  <div class="dock"><span class="on">&#9638; Library</span><span>&#8777;</span><span>&#9881;</span></div>
+</div></div><figcaption>Library: pinned first, long-press for the menu</figcaption></figure>
+
+<figure><div class="phone"><div class="sb"><span>9:41</span><span>5G 87%</span></div><div class="scr">
+  <h2>Shake</h2>
+  <div class="meter">
+    <span class="chip">Shake detected</span>
+    <div class="big">18.4<em>m/s&sup2;</em></div>
+    <div class="track"><div class="fill"></div><div class="th"></div></div>
+    <div class="cap">The line marks your threshold. Cross it twice within half a second.</div>
+  </div>
+  <div class="lab">Sensitivity</div>
+  <div class="grp"><div class="li"><div><b>Threshold</b><small>More sensitive to needs a firm shake</small></div><b style="color:var(--pri)">13.0</b></div></div>
+  <div class="lab">Background</div>
+  <div class="grp"><div class="li"><div><b>Shake in the background</b><small>Keeps a notification so Android lets WebHub listen</small></div><span class="sw on"></span></div></div>
+  <div class="dock"><span>&#9638;</span><span class="on">&#8777; Shake</span><span>&#9881;</span></div>
+</div></div><figcaption>Shake: live meter to tune sensitivity</figcaption></figure>
+
+<figure><div class="phone"><div class="sb"><span>9:41</span><span>5G 87%</span></div><div class="scr">
+  <h2>Settings</h2>
+  <div class="lab" style="margin-top:4px">Appearance</div>
+  <div class="grp"><div class="li"><div><b>Theme</b><small>Dark, Light or System</small></div></div><div class="li"><div><b>Dynamic color</b><small>Use colors from your wallpaper</small></div><span class="sw on"></span></div></div>
+  <div class="lab">Storage</div>
+  <div class="grp"><div class="li"><div><b>Apps</b><small>12.4 MB</small></div></div><div class="li"><div><b>Cache</b><small>1.2 MB</small></div></div></div>
+  <div class="lab">Backup</div>
+  <div class="grp"><div class="li"><div><b>Export backup</b><small>Apps list and settings as JSON</small></div></div><div class="li"><div><b>Import backup</b><small>Restores settings and per-app options</small></div></div></div>
+  <div class="dock"><span>&#9638;</span><span>&#8777;</span><span class="on">&#9881; Settings</span></div>
+</div></div><figcaption>Settings: theme, storage, backup, crash log</figcaption></figure>
+
+<figure><div class="phone"><div class="runner"><h3>Pomodoro Timer</h3><p>Your app fills the screen. The status bar area keeps clear of it unless the app is fullscreen.</p></div>
+  <div class="mini"><div class="pill"><i>&#8635;</i><i>&#8777;</i><i>&#9974;</i><i>&#10005;</i></div><div class="btn">&#10005;</div></div>
+</div><figcaption>Runner: draggable button expands to Reload, Shake action, Fullscreen, Close</figcaption></figure>
+
+</div>
+</body>
+</html>
