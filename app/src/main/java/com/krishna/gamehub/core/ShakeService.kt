@@ -51,7 +51,7 @@ class ShakeService : Service() {
         return NotificationCompat.Builder(this, CHANNEL)
             .setSmallIcon(R.drawable.ic_stat)
             .setContentTitle("Shake is on")
-            .setContentText("Gamehub is listening for shakes")
+            .setContentText("GameHub is listening for shakes")
             .setContentIntent(open)
             .setOngoing(true)
             .setSilent(true)

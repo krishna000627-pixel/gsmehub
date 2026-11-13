@@ -41,17 +41,21 @@ fun MainScreen(vm: MainViewModel) {
     var tab by rememberSaveable { mutableIntStateOf(0) }
     var detailId by rememberSaveable { mutableStateOf<String?>(null) }
     var lastDetail by remember { mutableStateOf("") }
+    var page by rememberSaveable { mutableStateOf<String?>(null) }
+    var lastPage by remember { mutableStateOf("about") }
     val snack = remember { SnackbarHostState() }
     LaunchedEffect(Unit) { vm.messages.collect { snack.showSnackbar(it) } }
 
-    BackHandler(enabled = detailId != null || tab != 0) {
-        if (detailId != null) detailId = null else tab = 0
+    BackHandler(enabled = page != null || detailId != null || tab != 0) {
+        if (page != null) page = null else if (detailId != null) detailId = null else tab = 0
     }
 
     val nav = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     val dockSpace = 64.dp + 12.dp + nav + 8.dp
     val d = detailId
     if (d != null) lastDetail = d
+    val pg = page
+    if (pg != null) lastPage = pg
 
     Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         AnimatedContent(
@@ -66,12 +70,15 @@ fun MainScreen(vm: MainViewModel) {
             when (t) {
                 0 -> LibraryScreen(vm, onDetail = { detailId = it }, bottomSpace = dockSpace)
                 1 -> ShakeScreen(vm, bottomSpace = dockSpace)
-                else -> SettingsScreen(vm, bottomSpace = dockSpace, onOpenShakeTab = { tab = 1 })
+                else -> SettingsScreen(
+                    vm, bottomSpace = dockSpace, onOpenShakeTab = { tab = 1 },
+                    onAbout = { page = "about" }, onCrashLog = { page = "crash" }
+                )
             }
         }
 
         AnimatedVisibility(
-            visible = detailId == null,
+            visible = detailId == null && page == null,
             modifier = Modifier.align(Alignment.BottomCenter),
             enter = slideInVertically(spring(stiffness = Spring.StiffnessMediumLow)) { it } + fadeIn(),
             exit = slideOutVertically { it } + fadeOut()
@@ -87,6 +94,14 @@ fun MainScreen(vm: MainViewModel) {
             exit = slideOutHorizontally { it / 3 } + fadeOut()
         ) {
             AppDetailScreen(lastDetail, vm) { detailId = null }
+        }
+
+        AnimatedVisibility(
+            visible = page != null,
+            enter = slideInHorizontally(spring(dampingRatio = 0.85f, stiffness = Spring.StiffnessMediumLow)) { it / 3 } + fadeIn(),
+            exit = slideOutHorizontally { it / 3 } + fadeOut()
+        ) {
+            if (lastPage == "crash") CrashLogScreen { page = null } else AboutScreen(vm) { page = null }
         }
     }
 }

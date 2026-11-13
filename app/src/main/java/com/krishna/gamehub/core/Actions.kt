@@ -29,9 +29,9 @@ object Actions {
 
     val options = listOf(
         ShakeOption(ONSHAKE, "Call window.onShake()", "Lets the page react itself"),
-        ShakeOption(LIBRARY, "Open Gamehub library", "Jump back to your apps"),
+        ShakeOption(LIBRARY, "Open GameHub library", "Jump back to your apps"),
         ShakeOption(FLASH, "Toggle flashlight", "Works anywhere"),
-        ShakeOption(SHOT, "Take screenshot", "Saved to Pictures/Gamehub"),
+        ShakeOption(SHOT, "Take screenshot", "Saved to Pictures/GameHub"),
         ShakeOption(BACK, "Go back", "Page history, then close"),
         ShakeOption(RELOAD, "Reload app", "Runs the page again"),
         ShakeOption(APP, "Open another app...", "Pick one from your library"),

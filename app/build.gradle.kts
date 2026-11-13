@@ -23,8 +23,8 @@ android {
         applicationId = "com.krishna.gamehub"
         minSdk = 26
         targetSdk = 34
-        versionCode = 2
-        versionName = "v2"
+        versionCode = 5
+        versionName = "v5"
     }
 
     signingConfigs {

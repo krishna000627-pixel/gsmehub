@@ -2,6 +2,21 @@
 
 package com.krishna.gamehub.ui
 
+import android.content.Context
+import android.content.Intent
+import android.graphics.BitmapFactory
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.material.icons.rounded.AddToHomeScreen
+import androidx.compose.material.icons.rounded.Shuffle
+import androidx.compose.material.icons.rounded.SwapVert
+import androidx.compose.material3.FilterChip
+import androidx.core.content.pm.ShortcutInfoCompat
+import androidx.core.content.pm.ShortcutManagerCompat
+import androidx.core.graphics.drawable.IconCompat
+import com.krishna.gamehub.R
+import com.krishna.gamehub.data.AppRepo
+import com.krishna.gamehub.data.Prefs
+import java.io.File
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.Spring
@@ -97,6 +112,10 @@ fun LibraryScreen(vm: MainViewModel, onDetail: (String) -> Unit, bottomSpace: Dp
     val apps by vm.apps.collectAsState()
     val importing by vm.importing.collectAsState()
     var query by rememberSaveable { mutableStateOf("") }
+    var filter by rememberSaveable { mutableStateOf("all") }
+    var sortMenu by remember { mutableStateOf(false) }
+    val sort by Prefs.librarySort.collectAsState()
+    val compact by Prefs.compactGrid.collectAsState()
     var menuFor by remember { mutableStateOf<String?>(null) }
     var showSheet by rememberSaveable { mutableStateOf(false) }
     var showPaste by rememberSaveable { mutableStateOf(false) }
@@ -128,57 +147,131 @@ fun LibraryScreen(vm: MainViewModel, onDetail: (String) -> Unit, bottomSpace: Dp
                     onAction = { showSheet = true }
                 )
             } else {
-                val filtered = remember(list, query) {
-                    if (query.isBlank()) list else list.filter { it.name.contains(query.trim(), ignoreCase = true) }
+                val filtered = remember(list, query, filter, sort) {
+                    var r = if (query.isBlank()) list else list.filter { it.name.contains(query.trim(), ignoreCase = true) }
+                    r = when (filter) {
+                        "pinned" -> r.filter { it.pinned }
+                        "recent" -> r.filter { it.lastOpened > 0 }.sortedByDescending { it.lastOpened }
+                        else -> r
+                    }
+                    if (filter == "recent") r else when (sort) {
+                        "name" -> r.sortedWith(compareByDescending<AppEntity> { it.pinned }.thenBy { it.name.lowercase() })
+                        "added" -> r.sortedWith(compareByDescending<AppEntity> { it.pinned }.thenByDescending { it.createdAt })
+                        else -> r
+                    }
                 }
-                Column(Modifier.fillMaxSize().statusBarsPadding()) {
-                    Text(
-                        "Library",
-                        style = MaterialTheme.typography.headlineMedium,
-                        modifier = Modifier.padding(start = 20.dp, top = 12.dp, end = 20.dp, bottom = 12.dp)
-                    )
-                    SearchField(query) { query = it }
-                    if (filtered.isEmpty()) {
-                        Text(
-                            "No app matches \"${query.trim()}\"",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(24.dp)
-                        )
-                    } else {
-                        LazyVerticalGrid(
-                            columns = GridCells.Adaptive(156.dp),
-                            contentPadding = PaddingValues(16.dp, 16.dp, 16.dp, bottomSpace + 88.dp),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp),
-                            modifier = Modifier.fillMaxSize()
+                val continueApp = remember(list) { list.filter { it.lastOpened > 0 }.maxByOrNull { it.lastOpened } }
+                val tick = rememberTick()
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(if (compact) 112.dp else 156.dp),
+                    contentPadding = PaddingValues(16.dp, 0.dp, 16.dp, bottomSpace + 88.dp),
+                    horizontalArrangement = Arrangement.spacedBy(if (compact) 12.dp else 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(if (compact) 12.dp else 16.dp),
+                    modifier = Modifier.fillMaxSize().statusBarsPadding()
+                ) {
+                    item(key = "hdr_title", span = { GridItemSpan(maxLineSpan) }) {
+                        Row(
+                            Modifier.fillMaxWidth().padding(start = 4.dp, top = 12.dp, bottom = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            items(filtered, key = { it.id }) { app ->
-                                Box(Modifier.animateItem()) {
-                                    AppCard(
-                                        app,
-                                        onClick = { RunnerActivity.start(ctx, app.id) },
-                                        onLong = { menuFor = app.id }
-                                    )
-                                    DropdownMenu(expanded = menuFor == app.id, onDismissRequest = { menuFor = null }) {
-                                        MenuItem("Run", Icons.Rounded.PlayArrow) {
-                                            menuFor = null
-                                            RunnerActivity.start(ctx, app.id)
+                            Column(Modifier.weight(1f)) {
+                                Text("GameHub", style = MaterialTheme.typography.headlineMedium)
+                                val pins = list.count { it.pinned }
+                                Text(
+                                    if (pins > 0) "${list.size} apps, $pins pinned" else "${list.size} apps",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            IconButton(onClick = { tick(); RunnerActivity.start(ctx, list.random().id) }) {
+                                Icon(Icons.Rounded.Shuffle, "Open a random app")
+                            }
+                        }
+                    }
+                    item(key = "hdr_search", span = { GridItemSpan(maxLineSpan) }) {
+                        SearchField(query, Modifier.fillMaxWidth()) { query = it }
+                    }
+                    if (continueApp != null && query.isBlank() && filter == "all") {
+                        item(key = "hdr_continue", span = { GridItemSpan(maxLineSpan) }) {
+                            Box(Modifier.padding(top = 16.dp)) {
+                                ContinueCard(continueApp) { RunnerActivity.start(ctx, continueApp.id) }
+                            }
+                        }
+                    }
+                    item(key = "hdr_chips", span = { GridItemSpan(maxLineSpan) }) {
+                        Row(
+                            Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 4.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            listOf("all" to "All", "pinned" to "Pinned", "recent" to "Recent").forEach { (k, label) ->
+                                FilterChip(
+                                    selected = filter == k,
+                                    onClick = { tick(); filter = k },
+                                    label = { Text(label) }
+                                )
+                            }
+                            Spacer(Modifier.weight(1f))
+                            Box {
+                                IconButton(onClick = { sortMenu = true }) { Icon(Icons.Rounded.SwapVert, "Sort") }
+                                DropdownMenu(expanded = sortMenu, onDismissRequest = { sortMenu = false }) {
+                                    listOf("recent" to "Recently opened", "name" to "Name A to Z", "added" to "Newest added")
+                                        .forEach { (k, label) ->
+                                            DropdownMenuItem(
+                                                text = { Text(if (sort == k) "\u2713  $label" else label) },
+                                                onClick = { Prefs.updateSort(k); sortMenu = false }
+                                            )
                                         }
-                                        MenuItem("Edit info", Icons.Rounded.Edit) { menuFor = null; editApp = app }
-                                        MenuItem("Shake action", Icons.Rounded.Vibration) { menuFor = null; shakeApp = app }
-                                        MenuItem("Permissions", Icons.Rounded.Shield) { menuFor = null; onDetail(app.id) }
-                                        MenuItem(if (app.pinned) "Unpin" else "Pin to top", Icons.Rounded.PushPin) {
-                                            menuFor = null
-                                            vm.save(app.copy(pinned = !app.pinned))
-                                        }
-                                        MenuItem("Export ZIP", Icons.Rounded.FileDownload) {
-                                            menuFor = null
-                                            exportId = app.id
-                                            exportPicker.launch(app.name.replace(Regex("[\\\\/:*?\"<>|]"), "_") + ".zip")
-                                        }
-                                        MenuItem("Delete", Icons.Rounded.Delete) { menuFor = null; deleteApp = app }
-                                    }
                                 }
+                            }
+                        }
+                    }
+                    if (filtered.isEmpty()) {
+                        item(key = "hdr_empty", span = { GridItemSpan(maxLineSpan) }) {
+                            Text(
+                                when {
+                                    query.isNotBlank() -> "No app matches \"${query.trim()}\""
+                                    filter == "pinned" -> "Nothing pinned yet. Long-press an app and choose Pin to top."
+                                    else -> "Nothing opened yet. Run an app and it shows up here."
+                                },
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(24.dp)
+                            )
+                        }
+                    }
+                    items(filtered, key = { it.id }) { app ->
+                        Box(Modifier.animateItem()) {
+                            AppCard(
+                                app,
+                                compact,
+                                onClick = { RunnerActivity.start(ctx, app.id) },
+                                onLong = { menuFor = app.id }
+                            )
+                            DropdownMenu(expanded = menuFor == app.id, onDismissRequest = { menuFor = null }) {
+                                MenuItem("Run", Icons.Rounded.PlayArrow) {
+                                    menuFor = null
+                                    RunnerActivity.start(ctx, app.id)
+                                }
+                                MenuItem("Add to home screen", Icons.Rounded.AddToHomeScreen) {
+                                    menuFor = null
+                                    val ok = pinShortcut(ctx, app)
+                                    vm.messages.tryEmit(
+                                        if (ok) "Confirm the shortcut in your launcher" else "Your launcher cannot add shortcuts"
+                                    )
+                                }
+                                MenuItem("Edit info", Icons.Rounded.Edit) { menuFor = null; editApp = app }
+                                MenuItem("Shake action", Icons.Rounded.Vibration) { menuFor = null; shakeApp = app }
+                                MenuItem("Permissions", Icons.Rounded.Shield) { menuFor = null; onDetail(app.id) }
+                                MenuItem(if (app.pinned) "Unpin" else "Pin to top", Icons.Rounded.PushPin) {
+                                    menuFor = null
+                                    vm.save(app.copy(pinned = !app.pinned))
+                                }
+                                MenuItem("Export ZIP", Icons.Rounded.FileDownload) {
+                                    menuFor = null
+                                    exportId = app.id
+                                    exportPicker.launch(app.name.replace(Regex("[\\\\/:*?\"<>|]"), "_") + ".zip")
+                                }
+                                MenuItem("Delete", Icons.Rounded.Delete) { menuFor = null; deleteApp = app }
                             }
                         }
                     }
@@ -261,7 +354,7 @@ private fun MenuItem(text: String, icon: ImageVector, onClick: () -> Unit) {
 }
 
 @Composable
-private fun SearchField(value: String, onChange: (String) -> Unit) {
+private fun SearchField(value: String, modifier: Modifier = Modifier, onChange: (String) -> Unit) {
     val cs = MaterialTheme.colorScheme
     TextField(
         value = value,
@@ -283,12 +376,53 @@ private fun SearchField(value: String, onChange: (String) -> Unit) {
             unfocusedContainerColor = cs.surfaceContainerHigh
         ),
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).heightIn(min = 56.dp)
+        modifier = modifier.heightIn(min = 56.dp)
     )
 }
 
 @Composable
-private fun AppCard(app: AppEntity, onClick: () -> Unit, onLong: () -> Unit) {
+private fun ContinueCard(app: AppEntity, onRun: () -> Unit) {
+    val cs = MaterialTheme.colorScheme
+    Surface(
+        shape = RoundedCornerShape(28.dp),
+        color = cs.primaryContainer,
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onRun)
+    ) {
+        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+            AppIcon(app, 60.dp)
+            Spacer(Modifier.width(16.dp))
+            Column(Modifier.weight(1f)) {
+                Text(
+                    "Continue",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = cs.onPrimaryContainer.copy(alpha = 0.7f)
+                )
+                Text(
+                    app.name,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = cs.onPrimaryContainer,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    relTime(app.lastOpened),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = cs.onPrimaryContainer.copy(alpha = 0.7f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+            Surface(shape = CircleShape, color = cs.primary, modifier = Modifier.size(52.dp)) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(Icons.Rounded.PlayArrow, "Run", tint = cs.onPrimary)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AppCard(app: AppEntity, compact: Boolean, onClick: () -> Unit, onLong: () -> Unit) {
     val src = remember { MutableInteractionSource() }
     val pressed by src.collectIsPressedAsState()
     val scale by animateFloatAsState(
@@ -310,9 +444,9 @@ private fun AppCard(app: AppEntity, onClick: () -> Unit, onLong: () -> Unit) {
             }
         )
     ) {
-        Column(Modifier.padding(16.dp)) {
+        Column(Modifier.padding(if (compact) 12.dp else 16.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
-                AppIcon(app, 56.dp)
+                AppIcon(app, if (compact) 44.dp else 56.dp)
                 Spacer(Modifier.weight(1f))
                 if (app.pinned) {
                     Icon(
@@ -321,17 +455,54 @@ private fun AppCard(app: AppEntity, onClick: () -> Unit, onLong: () -> Unit) {
                     )
                 }
             }
-            Spacer(Modifier.height(12.dp))
-            Text(app.name, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Spacer(Modifier.height(if (compact) 8.dp else 12.dp))
             Text(
-                relTime(app.lastOpened),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                app.name,
+                style = if (compact) MaterialTheme.typography.titleSmall else MaterialTheme.typography.titleMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
+            if (!compact) {
+                Text(
+                    relTime(app.lastOpened),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                val meta = listOfNotNull(
+                    app.version.takeIf { it.isNotBlank() },
+                    app.sizeBytes.takeIf { it > 0 }?.let { formatSize(it) }
+                ).joinToString(" \u00B7 ")
+                if (meta.isNotEmpty()) {
+                    Text(
+                        meta,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.outline,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
         }
     }
+}
+
+private fun pinShortcut(ctx: Context, app: AppEntity): Boolean {
+    if (!ShortcutManagerCompat.isRequestPinShortcutSupported(ctx)) return false
+    val bmp = app.icon?.let { BitmapFactory.decodeFile(File(AppRepo.dirOf(app.id), it).path) }
+    val icon = if (bmp != null) IconCompat.createWithBitmap(bmp)
+    else IconCompat.createWithResource(ctx, R.mipmap.ic_launcher)
+    val intent = Intent(ctx, RunnerActivity::class.java)
+        .setAction(Intent.ACTION_VIEW)
+        .putExtra(RunnerActivity.EXTRA_ID, app.id)
+    val info = ShortcutInfoCompat.Builder(ctx, "app_" + app.id)
+        .setShortLabel(app.name.take(24))
+        .setLongLabel(app.name)
+        .setIcon(icon)
+        .setIntent(intent)
+        .build()
+    return ShortcutManagerCompat.requestPinShortcut(ctx, info, null)
 }
 
 @Composable

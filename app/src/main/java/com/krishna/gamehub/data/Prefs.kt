@@ -15,6 +15,8 @@ object Prefs {
     private val sensitivityFlow = MutableStateFlow(13f)
     private val backgroundFlow = MutableStateFlow(false)
     private val autoStartFlow = MutableStateFlow(false)
+    private val sortFlow = MutableStateFlow("recent")
+    private val compactFlow = MutableStateFlow(false)
 
     val theme: StateFlow<String> = themeFlow
     val dynamicColor: StateFlow<Boolean> = dynamicFlow
@@ -22,6 +24,8 @@ object Prefs {
     val sensitivity: StateFlow<Float> = sensitivityFlow
     val backgroundShake: StateFlow<Boolean> = backgroundFlow
     val autoStartDone: StateFlow<Boolean> = autoStartFlow
+    val librarySort: StateFlow<String> = sortFlow
+    val compactGrid: StateFlow<Boolean> = compactFlow
 
     fun init(ctx: Context) {
         sp = ctx.getSharedPreferences("gamehub_prefs", Context.MODE_PRIVATE)
@@ -31,6 +35,8 @@ object Prefs {
         sensitivityFlow.value = sp.getFloat("sensitivity", 13f)
         backgroundFlow.value = sp.getBoolean("background_shake", false)
         autoStartFlow.value = sp.getBoolean("auto_start_done", false)
+        sortFlow.value = sp.getString("library_sort", "recent") ?: "recent"
+        compactFlow.value = sp.getBoolean("compact_grid", false)
     }
 
     fun updateTheme(v: String) {
@@ -61,6 +67,16 @@ object Prefs {
     fun updateAutoStartDone(v: Boolean) {
         autoStartFlow.value = v
         sp.edit().putBoolean("auto_start_done", v).apply()
+    }
+
+    fun updateSort(v: String) {
+        sortFlow.value = v
+        sp.edit().putString("library_sort", v).apply()
+    }
+
+    fun updateCompact(v: Boolean) {
+        compactFlow.value = v
+        sp.edit().putBoolean("compact_grid", v).apply()
     }
 
     fun toJson(): JSONObject = JSONObject()

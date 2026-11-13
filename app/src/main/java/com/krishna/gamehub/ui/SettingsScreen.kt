@@ -23,6 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.BugReport
 import androidx.compose.material.icons.rounded.FileDownload
+import androidx.compose.material.icons.rounded.GridView
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.Restore
@@ -59,7 +60,13 @@ import com.krishna.gamehub.web.WebViewPool
 import kotlinx.coroutines.launch
 
 @Composable
-fun SettingsScreen(vm: MainViewModel, bottomSpace: Dp, onOpenShakeTab: () -> Unit) {
+fun SettingsScreen(
+    vm: MainViewModel,
+    bottomSpace: Dp,
+    onOpenShakeTab: () -> Unit,
+    onAbout: () -> Unit,
+    onCrashLog: () -> Unit
+) {
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
     val theme by Prefs.theme.collectAsState()
@@ -67,13 +74,13 @@ fun SettingsScreen(vm: MainViewModel, bottomSpace: Dp, onOpenShakeTab: () -> Uni
     val defaultAction by Prefs.defaultShake.collectAsState()
     val threshold by Prefs.sensitivity.collectAsState()
     val bg by Prefs.backgroundShake.collectAsState()
+    val compact by Prefs.compactGrid.collectAsState()
     val apps by vm.apps.collectAsState()
     val toggleBg = rememberBgShakeToggle()
     val tick = rememberTick()
 
     var showPicker by remember { mutableStateOf(false) }
-    var showLog by remember { mutableStateOf(false) }
-    var showAbout by remember { mutableStateOf(false) }
+    val logCount = parseCrashLog(CrashLog.read()).size
     var statsTick by remember { mutableIntStateOf(0) }
     var clearing by remember { mutableStateOf(false) }
     val stats by produceState<Pair<Long, Long>?>(null, statsTick, apps?.size) { value = AppRepo.storageStats() }
@@ -113,6 +120,9 @@ fun SettingsScreen(vm: MainViewModel, bottomSpace: Dp, onOpenShakeTab: () -> Uni
                 ToggleRow("Dynamic color", "Use colors from your wallpaper", dynamic, Icons.Rounded.Palette) {
                     Prefs.updateDynamicColor(it)
                 }
+            }
+            ToggleRow("Compact grid", "Smaller cards, more apps on screen", compact, Icons.Rounded.GridView) {
+                Prefs.updateCompact(it)
             }
         }
 
@@ -159,8 +169,13 @@ fun SettingsScreen(vm: MainViewModel, bottomSpace: Dp, onOpenShakeTab: () -> Uni
 
         SectionTitle("About")
         GroupCard {
-            NavRow("About Gamehub", "Version ${BuildConfig.VERSION_NAME}", Icons.Rounded.Info) { showAbout = true }
-            NavRow("Crash log", "Errors Gamehub caught on this device", Icons.Rounded.BugReport) { showLog = true }
+            NavRow("About GameHub", "Version ${BuildConfig.VERSION_NAME}, what's new and device info", Icons.Rounded.Info, onAbout)
+            NavRow(
+                "Crash log",
+                if (logCount == 0) "No errors logged" else "$logCount logged, tap to review or share",
+                Icons.Rounded.BugReport,
+                onCrashLog
+            )
         }
         Spacer(Modifier.height(bottomSpace + 16.dp))
     }
@@ -172,47 +187,6 @@ fun SettingsScreen(vm: MainViewModel, bottomSpace: Dp, onOpenShakeTab: () -> Uni
             includeDefault = false,
             onPick = { Prefs.updateDefaultShake(it); showPicker = false },
             onDismiss = { showPicker = false }
-        )
-    }
-
-    if (showAbout) {
-        AlertDialog(
-            onDismissRequest = { showAbout = false },
-            title = { Text("Gamehub ${BuildConfig.VERSION_NAME}") },
-            text = {
-                Text(
-                    "Imports, stores and runs offline HTML apps in a fast WebView. " +
-                        "Every app has its own storage and no internet unless you allow it."
-                )
-            },
-            confirmButton = { TextButton(onClick = { showAbout = false }) { Text("Close") } }
-        )
-    }
-
-    if (showLog) {
-        var log by remember { mutableStateOf(CrashLog.read()) }
-        AlertDialog(
-            onDismissRequest = { showLog = false },
-            title = { Text("Crash log") },
-            text = {
-                Column(Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState())) {
-                    Text(
-                        log.ifBlank { "Nothing logged." },
-                        fontFamily = FontFamily.Monospace,
-                        fontSize = 11.sp
-                    )
-                }
-            },
-            confirmButton = { TextButton(onClick = { showLog = false }) { Text("Close") } },
-            dismissButton = {
-                Row {
-                    TextButton(onClick = {
-                        val cm = ctx.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                        cm.setPrimaryClip(ClipData.newPlainText("Gamehub crash log", log))
-                    }) { Text("Copy") }
-                    TextButton(onClick = { CrashLog.clear(); log = "" }) { Text("Clear") }
-                }
-            }
         )
     }
 }

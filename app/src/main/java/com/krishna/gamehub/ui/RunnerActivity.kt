@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 
 package com.krishna.gamehub.ui
 
@@ -27,6 +27,14 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.widget.EditText
 import android.widget.Toast
+import kotlinx.coroutines.flow.first
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -437,12 +445,12 @@ class RunnerActivity : ComponentActivity() {
     }
 
     private fun saveToGallery(bmp: Bitmap) {
-        val name = "Gamehub_${System.currentTimeMillis()}.png"
+        val name = "GameHub_${System.currentTimeMillis()}.png"
         if (Build.VERSION.SDK_INT >= 29) {
             val cv = ContentValues().apply {
                 put(MediaStore.Images.Media.DISPLAY_NAME, name)
                 put(MediaStore.Images.Media.MIME_TYPE, "image/png")
-                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Gamehub")
+                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/GameHub")
             }
             val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv) ?: error("insert failed")
             contentResolver.openOutputStream(uri)!!.use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
@@ -558,10 +566,23 @@ private fun MiniControls(
     onClose: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
+    var hidden by rememberSaveable { mutableStateOf(false) }
     var pos by remember { mutableStateOf<Offset?>(null) }
     val density = LocalDensity.current
+    val ctx = LocalContext.current
+    val haptic = LocalHapticFeedback.current
     val sizePx = with(density) { 48.dp.toPx() }
     BackHandler(enabled = expanded) { expanded = false }
+
+    // Hidden by a long press, brought back by the next shake.
+    LaunchedEffect(hidden) {
+        if (hidden) {
+            val before = ShakeHub.lastShake.value
+            ShakeHub.lastShake.first { it != before }
+            hidden = false
+        }
+    }
+    if (hidden) return
 
     BoxWithConstraints(Modifier.fillMaxSize()) {
         val maxW = constraints.maxWidth.toFloat()
@@ -588,7 +609,15 @@ private fun MiniControls(
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.92f),
                 shadowElevation = 6.dp,
-                modifier = Modifier.size(48.dp).clickable { expanded = !expanded }
+                modifier = Modifier.size(48.dp).combinedClickable(
+                    onClick = { expanded = !expanded },
+                    onLongClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        expanded = false
+                        hidden = true
+                        Toast.makeText(ctx, "Controls hidden. Shake to bring them back.", Toast.LENGTH_SHORT).show()
+                    }
+                )
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(

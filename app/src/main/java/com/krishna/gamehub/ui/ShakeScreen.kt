@@ -159,7 +159,7 @@ fun ShakeScreen(vm: MainViewModel, bottomSpace: Dp) {
         GroupCard {
             ToggleRow(
                 "Shake in the background",
-                "Keeps a notification so Android lets Gamehub listen while the app is closed.",
+                "Keeps a notification so Android lets GameHub listen while the app is closed.",
                 bg, Icons.Rounded.Vibration
             ) { toggleBg(it) }
         }
@@ -169,7 +169,7 @@ fun ShakeScreen(vm: MainViewModel, bottomSpace: Dp) {
         }
         Text(
             "With another app on screen, a shake can open the library or another app and toggle the flashlight. " +
-                "Screenshot, back, reload and window.onShake() need an app open in Gamehub.",
+                "Screenshot, back, reload and window.onShake() need an app open in GameHub.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(start = 8.dp, top = 12.dp, end = 8.dp)
@@ -289,7 +289,7 @@ private fun BackgroundGuide() {
         }
         GuideStep(
             Icons.Rounded.BatteryChargingFull, "Remove battery limits",
-            "Choose Allow, then in App battery management set Gamehub to Don't optimize.", battery, "Exempt"
+            "Choose Allow, then in App battery management set GameHub to Don't optimize.", battery, "Exempt"
         ) {
             if (!launch(ctx, Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:$pkg")))) {
                 launch(ctx, Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
@@ -303,7 +303,7 @@ private fun BackgroundGuide() {
         }
         GuideStep(
             Icons.Rounded.RocketLaunch, "Allow auto-start",
-            "Turn on Auto-start (or Allow auto-launch) for Gamehub, then lock Gamehub in the recent apps list.",
+            "Turn on Auto-start (or Allow auto-launch) for GameHub, then lock GameHub in the recent apps list.",
             autoDone, "Open"
         ) { openAutoStart(ctx) }
         Row(

@@ -330,7 +330,7 @@ object AppRepo {
     suspend fun restoreBackup(text: String): Result<Pair<Int, Int>> = withContext(Dispatchers.IO) {
         runCatching {
             val root = JSONObject(text)
-            if (root.optString("format") != "gamehub-backup") throw IOException("Not a Gamehub backup")
+            if (root.optString("format") != "gamehub-backup") throw IOException("Not a GameHub backup")
             root.optJSONObject("settings")?.let { Prefs.restore(it) }
             val arr = root.optJSONArray("apps") ?: JSONArray()
             var restored = 0

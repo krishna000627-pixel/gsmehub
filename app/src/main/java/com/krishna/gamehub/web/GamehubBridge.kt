@@ -98,7 +98,7 @@ class GamehubBridge(private val act: RunnerActivity, private val appId: String) 
             }
             "clipboardSet" -> {
                 val cm = act.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                cm.setPrimaryClip(ClipData.newPlainText("Gamehub", a.optString(0)))
+                cm.setPrimaryClip(ClipData.newPlainText("GameHub", a.optString(0)))
                 resolve(cb, "true")
             }
             "saveFile" -> {
@@ -156,7 +156,7 @@ class GamehubBridge(private val act: RunnerActivity, private val appId: String) 
         )
         val n = NotificationCompat.Builder(act, CHANNEL)
             .setSmallIcon(R.drawable.ic_stat)
-            .setContentTitle(title.ifBlank { act.currentApp?.name ?: "Gamehub" })
+            .setContentTitle(title.ifBlank { act.currentApp?.name ?: "GameHub" })
             .setContentText(body)
             .setAutoCancel(true)
             .setContentIntent(open)
