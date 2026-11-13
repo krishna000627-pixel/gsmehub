@@ -1,4 +1,4 @@
-package com.krishna.webhub.core
+package com.krishna.gamehub.core
 
 import android.content.Context
 import android.util.Log

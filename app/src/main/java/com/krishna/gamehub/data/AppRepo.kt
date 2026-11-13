@@ -1,11 +1,11 @@
-package com.krishna.webhub.data
+package com.krishna.gamehub.data
 
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.documentfile.provider.DocumentFile
 import androidx.room.Room
-import com.krishna.webhub.core.Actions
+import com.krishna.gamehub.core.Actions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -36,7 +36,7 @@ object AppRepo {
 
     fun init(c: Context) {
         ctx = c.applicationContext
-        db = Room.databaseBuilder(ctx, Db::class.java, "webhub.db").build()
+        db = Room.databaseBuilder(ctx, Db::class.java, "gamehub.db").build()
         appsDir.mkdirs()
         appsDir.listFiles()?.filter { it.name.startsWith(".tmp-") }?.forEach { it.deleteRecursively() }
     }
@@ -223,7 +223,7 @@ object AppRepo {
 
     private fun buildEntity(id: String, dir: File, fallbackName: String?): AppEntity {
         val entry = findEntry(dir)
-        val json = File(dir, "webhub.json").takeIf { it.isFile }
+        val json = File(dir, "gamehub.json").takeIf { it.isFile }
             ?.let { runCatching { JSONObject(it.readText()) }.getOrNull() }
         val html = head(File(dir, entry))
         val title = Regex("<title[^>]*>(.*?)</title>", setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL))
@@ -286,12 +286,12 @@ object AppRepo {
             val os = ctx.contentResolver.openOutputStream(out, "wt") ?: throw IOException("Cannot write file")
             os.use {
                 ZipOutputStream(BufferedOutputStream(it)).use { z ->
-                    z.putNextEntry(ZipEntry("webhub.json"))
+                    z.putNextEntry(ZipEntry("gamehub.json"))
                     z.write(metaJson(app).toString(2).toByteArray())
                     z.closeEntry()
                     dir.walkTopDown().filter { f -> f.isFile }.forEach { f ->
                         val rel = f.relativeTo(dir).invariantSeparatorsPath
-                        if (rel != "webhub.json") {
+                        if (rel != "gamehub.json") {
                             z.putNextEntry(ZipEntry(rel))
                             f.inputStream().use { i -> i.copyTo(z) }
                             z.closeEntry()
@@ -322,7 +322,7 @@ object AppRepo {
                     .put("shakeAction", a.shakeAction).put("pinned", a.pinned)
             )
         }
-        JSONObject().put("format", "webhub-backup").put("version", 1)
+        JSONObject().put("format", "gamehub-backup").put("version", 1)
             .put("settings", Prefs.toJson()).put("apps", arr).toString(2)
     }
 
@@ -330,7 +330,7 @@ object AppRepo {
     suspend fun restoreBackup(text: String): Result<Pair<Int, Int>> = withContext(Dispatchers.IO) {
         runCatching {
             val root = JSONObject(text)
-            if (root.optString("format") != "webhub-backup") throw IOException("Not a WebHub backup")
+            if (root.optString("format") != "gamehub-backup") throw IOException("Not a Gamehub backup")
             root.optJSONObject("settings")?.let { Prefs.restore(it) }
             val arr = root.optJSONArray("apps") ?: JSONArray()
             var restored = 0

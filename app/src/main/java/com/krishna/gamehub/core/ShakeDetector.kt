@@ -1,4 +1,4 @@
-package com.krishna.webhub.core
+package com.krishna.gamehub.core
 
 import android.content.Context
 import android.hardware.Sensor
@@ -6,8 +6,8 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.SystemClock
-import com.krishna.webhub.WebHubApp
-import com.krishna.webhub.data.Prefs
+import com.krishna.gamehub.GamehubApp
+import com.krishna.gamehub.data.Prefs
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.math.sqrt
 
@@ -89,7 +89,7 @@ object ShakeHub {
             owners.add(owner)
             if (detector == null) {
                 detector = ShakeDetector(
-                    WebHubApp.instance,
+                    GamehubApp.instance,
                     threshold = { Prefs.sensitivity.value },
                     onForce = { if (meterActive) force.value = it },
                     onShake = { handleShake() }
@@ -109,7 +109,7 @@ object ShakeHub {
     }
 
     private fun handleShake() {
-        val app = WebHubApp.instance
+        val app = GamehubApp.instance
         Haptics.tick(app)
         lastShake.value = SystemClock.elapsedRealtime()
         if (meterActive) return

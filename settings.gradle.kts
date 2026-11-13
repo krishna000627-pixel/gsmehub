@@ -12,5 +12,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "WebHub"
+rootProject.name = "Gamehub"
 include(":app")

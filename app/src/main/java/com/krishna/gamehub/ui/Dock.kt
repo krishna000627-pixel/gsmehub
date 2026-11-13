@@ -1,4 +1,4 @@
-package com.krishna.webhub.ui
+package com.krishna.gamehub.ui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState

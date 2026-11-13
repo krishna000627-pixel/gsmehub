@@ -1,4 +1,4 @@
-package com.krishna.webhub.ui
+package com.krishna.gamehub.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent

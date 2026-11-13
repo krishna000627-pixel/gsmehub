@@ -1,12 +1,12 @@
-package com.krishna.webhub.ui
+package com.krishna.gamehub.ui
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.krishna.webhub.core.CrashLog
-import com.krishna.webhub.data.AppEntity
-import com.krishna.webhub.data.AppRepo
-import com.krishna.webhub.web.WebViewPool
+import com.krishna.gamehub.core.CrashLog
+import com.krishna.gamehub.data.AppEntity
+import com.krishna.gamehub.data.AppRepo
+import com.krishna.gamehub.web.WebViewPool
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow

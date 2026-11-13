@@ -1,4 +1,4 @@
-package com.krishna.webhub.web
+package com.krishna.gamehub.web
 
 import android.graphics.Bitmap
 import android.net.Uri
@@ -7,7 +7,7 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.webkit.WebViewAssetLoader
-import com.krishna.webhub.data.AppRepo
+import com.krishna.gamehub.data.AppRepo
 import java.io.ByteArrayInputStream
 
 /**
@@ -65,7 +65,7 @@ class AppWebClient(
 
     override fun onPageStarted(view: WebView, url: String?, favicon: Bitmap?) {
         if (url != null && Uri.parse(url).host.equals(host, ignoreCase = true)) {
-            view.evaluateJavascript(WebHubBridge.SHIM, null)
+            view.evaluateJavascript(GamehubBridge.SHIM, null)
         }
     }
 

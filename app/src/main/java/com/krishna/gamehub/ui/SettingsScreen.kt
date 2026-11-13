@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.krishna.webhub.ui
+package com.krishna.gamehub.ui
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -50,12 +50,12 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.krishna.webhub.BuildConfig
-import com.krishna.webhub.core.Actions
-import com.krishna.webhub.core.CrashLog
-import com.krishna.webhub.data.AppRepo
-import com.krishna.webhub.data.Prefs
-import com.krishna.webhub.web.WebViewPool
+import com.krishna.gamehub.BuildConfig
+import com.krishna.gamehub.core.Actions
+import com.krishna.gamehub.core.CrashLog
+import com.krishna.gamehub.data.AppRepo
+import com.krishna.gamehub.data.Prefs
+import com.krishna.gamehub.web.WebViewPool
 import kotlinx.coroutines.launch
 
 @Composable
@@ -150,7 +150,7 @@ fun SettingsScreen(vm: MainViewModel, bottomSpace: Dp, onOpenShakeTab: () -> Uni
         SectionTitle("Backup")
         GroupCard {
             NavRow("Export backup", "Apps list and settings as JSON", Icons.Rounded.FileDownload) {
-                exportPicker.launch("webhub-backup.json")
+                exportPicker.launch("gamehub-backup.json")
             }
             NavRow("Import backup", "Restores settings and per-app options", Icons.Rounded.Restore) {
                 importPicker.launch(arrayOf("application/json", "text/plain", "application/octet-stream"))
@@ -159,8 +159,8 @@ fun SettingsScreen(vm: MainViewModel, bottomSpace: Dp, onOpenShakeTab: () -> Uni
 
         SectionTitle("About")
         GroupCard {
-            NavRow("About WebHub", "Version ${BuildConfig.VERSION_NAME}", Icons.Rounded.Info) { showAbout = true }
-            NavRow("Crash log", "Errors WebHub caught on this device", Icons.Rounded.BugReport) { showLog = true }
+            NavRow("About Gamehub", "Version ${BuildConfig.VERSION_NAME}", Icons.Rounded.Info) { showAbout = true }
+            NavRow("Crash log", "Errors Gamehub caught on this device", Icons.Rounded.BugReport) { showLog = true }
         }
         Spacer(Modifier.height(bottomSpace + 16.dp))
     }
@@ -178,7 +178,7 @@ fun SettingsScreen(vm: MainViewModel, bottomSpace: Dp, onOpenShakeTab: () -> Uni
     if (showAbout) {
         AlertDialog(
             onDismissRequest = { showAbout = false },
-            title = { Text("WebHub ${BuildConfig.VERSION_NAME}") },
+            title = { Text("Gamehub ${BuildConfig.VERSION_NAME}") },
             text = {
                 Text(
                     "Imports, stores and runs offline HTML apps in a fast WebView. " +
@@ -208,7 +208,7 @@ fun SettingsScreen(vm: MainViewModel, bottomSpace: Dp, onOpenShakeTab: () -> Uni
                 Row {
                     TextButton(onClick = {
                         val cm = ctx.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                        cm.setPrimaryClip(ClipData.newPlainText("WebHub crash log", log))
+                        cm.setPrimaryClip(ClipData.newPlainText("Gamehub crash log", log))
                     }) { Text("Copy") }
                     TextButton(onClick = { CrashLog.clear(); log = "" }) { Text("Clear") }
                 }

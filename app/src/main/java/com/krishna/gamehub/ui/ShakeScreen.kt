@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.krishna.webhub.ui
+package com.krishna.gamehub.ui
 
 import android.content.ActivityNotFoundException
 import android.content.ComponentName
@@ -70,10 +70,10 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.krishna.webhub.core.Actions
-import com.krishna.webhub.core.ShakeHub
-import com.krishna.webhub.core.ShakeService
-import com.krishna.webhub.data.Prefs
+import com.krishna.gamehub.core.Actions
+import com.krishna.gamehub.core.ShakeHub
+import com.krishna.gamehub.core.ShakeService
+import com.krishna.gamehub.data.Prefs
 import kotlinx.coroutines.delay
 
 /** Shared by the Shake and Settings tabs. Returns a handler for the background switch. */
@@ -159,7 +159,7 @@ fun ShakeScreen(vm: MainViewModel, bottomSpace: Dp) {
         GroupCard {
             ToggleRow(
                 "Shake in the background",
-                "Keeps a notification so Android lets WebHub listen while the app is closed.",
+                "Keeps a notification so Android lets Gamehub listen while the app is closed.",
                 bg, Icons.Rounded.Vibration
             ) { toggleBg(it) }
         }
@@ -169,7 +169,7 @@ fun ShakeScreen(vm: MainViewModel, bottomSpace: Dp) {
         }
         Text(
             "With another app on screen, a shake can open the library or another app and toggle the flashlight. " +
-                "Screenshot, back, reload and window.onShake() need an app open in WebHub.",
+                "Screenshot, back, reload and window.onShake() need an app open in Gamehub.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(start = 8.dp, top = 12.dp, end = 8.dp)
@@ -289,7 +289,7 @@ private fun BackgroundGuide() {
         }
         GuideStep(
             Icons.Rounded.BatteryChargingFull, "Remove battery limits",
-            "Choose Allow, then in App battery management set WebHub to Don't optimize.", battery, "Exempt"
+            "Choose Allow, then in App battery management set Gamehub to Don't optimize.", battery, "Exempt"
         ) {
             if (!launch(ctx, Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:$pkg")))) {
                 launch(ctx, Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
@@ -303,7 +303,7 @@ private fun BackgroundGuide() {
         }
         GuideStep(
             Icons.Rounded.RocketLaunch, "Allow auto-start",
-            "Turn on Auto-start (or Allow auto-launch) for WebHub, then lock WebHub in the recent apps list.",
+            "Turn on Auto-start (or Allow auto-launch) for Gamehub, then lock Gamehub in the recent apps list.",
             autoDone, "Open"
         ) { openAutoStart(ctx) }
         Row(

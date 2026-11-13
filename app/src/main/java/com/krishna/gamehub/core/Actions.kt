@@ -1,4 +1,4 @@
-package com.krishna.webhub.core
+package com.krishna.gamehub.core
 
 import android.content.Context
 import android.content.Intent
@@ -9,10 +9,10 @@ import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
-import com.krishna.webhub.data.AppEntity
-import com.krishna.webhub.data.Prefs
-import com.krishna.webhub.ui.MainActivity
-import com.krishna.webhub.ui.RunnerActivity
+import com.krishna.gamehub.data.AppEntity
+import com.krishna.gamehub.data.Prefs
+import com.krishna.gamehub.ui.MainActivity
+import com.krishna.gamehub.ui.RunnerActivity
 
 data class ShakeOption(val id: String, val label: String, val hint: String)
 
@@ -29,9 +29,9 @@ object Actions {
 
     val options = listOf(
         ShakeOption(ONSHAKE, "Call window.onShake()", "Lets the page react itself"),
-        ShakeOption(LIBRARY, "Open WebHub library", "Jump back to your apps"),
+        ShakeOption(LIBRARY, "Open Gamehub library", "Jump back to your apps"),
         ShakeOption(FLASH, "Toggle flashlight", "Works anywhere"),
-        ShakeOption(SHOT, "Take screenshot", "Saved to Pictures/WebHub"),
+        ShakeOption(SHOT, "Take screenshot", "Saved to Pictures/Gamehub"),
         ShakeOption(BACK, "Go back", "Page history, then close"),
         ShakeOption(RELOAD, "Reload app", "Runs the page again"),
         ShakeOption(APP, "Open another app...", "Pick one from your library"),

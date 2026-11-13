@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -5,23 +8,23 @@ plugins {
     id("com.google.devtools.ksp")
 }
 
-val keystoreProps = java.util.Properties().apply {
+val keystoreProps = Properties().apply {
     val f = rootProject.file("keystore.properties")
-    if (f.exists()) f.inputStream().use { load(it) }
+    if (f.exists()) FileInputStream(f).use { load(it) }
 }
 val releaseKeystore: File = keystoreProps.getProperty("storeFile")
     ?.let { rootProject.file(it) } ?: file("release.keystore")
 
 android {
-    namespace = "com.krishna.webhub"
+    namespace = "com.krishna.gamehub"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.krishna.webhub"
+        applicationId = "com.krishna.gamehub"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "v1"
+        versionCode = 2
+        versionName = "v2"
     }
 
     signingConfigs {

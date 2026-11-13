@@ -1,4 +1,4 @@
-package com.krishna.webhub.ui
+package com.krishna.gamehub.ui
 
 import android.app.Activity
 import android.os.Build
@@ -20,7 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
-import com.krishna.webhub.data.Prefs
+import com.krishna.gamehub.data.Prefs
 
 private val DarkScheme = darkColorScheme(
     primary = Color(0xFFB4BEFF),
@@ -63,7 +63,7 @@ private val LightScheme = lightColorScheme(
 )
 
 @Composable
-fun WebHubTheme(content: @Composable () -> Unit) {
+fun GamehubTheme(content: @Composable () -> Unit) {
     val mode by Prefs.theme.collectAsState()
     val dynamic by Prefs.dynamicColor.collectAsState()
     val dark = when (mode) {

@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 
-package com.krishna.webhub.ui
+package com.krishna.gamehub.ui
 
 import android.graphics.BitmapFactory
 import android.util.LruCache
@@ -59,10 +59,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.krishna.webhub.core.Actions
-import com.krishna.webhub.core.ShakeOption
-import com.krishna.webhub.data.AppEntity
-import com.krishna.webhub.data.AppRepo
+import com.krishna.gamehub.core.Actions
+import com.krishna.gamehub.core.ShakeOption
+import com.krishna.gamehub.data.AppEntity
+import com.krishna.gamehub.data.AppRepo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File

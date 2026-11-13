@@ -1,4 +1,4 @@
-package com.krishna.webhub.data
+package com.krishna.gamehub.data
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -24,7 +24,7 @@ object Prefs {
     val autoStartDone: StateFlow<Boolean> = autoStartFlow
 
     fun init(ctx: Context) {
-        sp = ctx.getSharedPreferences("webhub_prefs", Context.MODE_PRIVATE)
+        sp = ctx.getSharedPreferences("gamehub_prefs", Context.MODE_PRIVATE)
         themeFlow.value = sp.getString("theme", "dark") ?: "dark"
         dynamicFlow.value = sp.getBoolean("dynamic", true)
         defaultShakeFlow.value = sp.getString("default_shake", "library") ?: "library"

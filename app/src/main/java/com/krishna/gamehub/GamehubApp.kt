@@ -1,12 +1,12 @@
-package com.krishna.webhub
+package com.krishna.gamehub
 
 import android.app.Application
-import com.krishna.webhub.core.CrashLog
-import com.krishna.webhub.data.AppRepo
-import com.krishna.webhub.data.Prefs
-import com.krishna.webhub.web.WebViewPool
+import com.krishna.gamehub.core.CrashLog
+import com.krishna.gamehub.data.AppRepo
+import com.krishna.gamehub.data.Prefs
+import com.krishna.gamehub.web.WebViewPool
 
-class WebHubApp : Application() {
+class GamehubApp : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
@@ -17,7 +17,7 @@ class WebHubApp : Application() {
     }
 
     companion object {
-        lateinit var instance: WebHubApp
+        lateinit var instance: GamehubApp
             private set
     }
 }

@@ -1,4 +1,4 @@
-package com.krishna.webhub.web
+package com.krishna.gamehub.web
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -13,7 +13,7 @@ import android.webkit.CookieManager
 import android.webkit.WebSettings
 import android.webkit.WebStorage
 import android.webkit.WebView
-import com.krishna.webhub.data.AppRepo
+import com.krishna.gamehub.data.AppRepo
 import kotlin.math.min
 
 /** One WebView created in Application.onCreate and reused for every run. */
@@ -64,7 +64,7 @@ object WebViewPool {
         owner = null
         (w.parent as? ViewGroup)?.removeView(w)
         w.stopLoading()
-        w.removeJavascriptInterface(WebHubBridge.NAME)
+        w.removeJavascriptInterface(GamehubBridge.NAME)
         w.loadUrl("about:blank")
         w.clearHistory()
         wrapper.baseContext = app

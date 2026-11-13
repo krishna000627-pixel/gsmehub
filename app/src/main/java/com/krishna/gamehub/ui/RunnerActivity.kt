@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.krishna.webhub.ui
+package com.krishna.gamehub.ui
 
 import android.Manifest
 import android.app.AlertDialog
@@ -96,15 +96,15 @@ import androidx.lifecycle.lifecycleScope
 import androidx.webkit.ScriptHandler
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
-import com.krishna.webhub.core.Actions
-import com.krishna.webhub.core.CrashLog
-import com.krishna.webhub.core.ShakeHub
-import com.krishna.webhub.data.AppEntity
-import com.krishna.webhub.data.AppRepo
-import com.krishna.webhub.data.Prefs
-import com.krishna.webhub.web.AppWebClient
-import com.krishna.webhub.web.WebHubBridge
-import com.krishna.webhub.web.WebViewPool
+import com.krishna.gamehub.core.Actions
+import com.krishna.gamehub.core.CrashLog
+import com.krishna.gamehub.core.ShakeHub
+import com.krishna.gamehub.data.AppEntity
+import com.krishna.gamehub.data.AppRepo
+import com.krishna.gamehub.data.Prefs
+import com.krishna.gamehub.web.AppWebClient
+import com.krishna.gamehub.web.GamehubBridge
+import com.krishna.gamehub.web.WebViewPool
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -257,7 +257,7 @@ class RunnerActivity : ComponentActivity() {
         }
         web = WebViewPool.acquire(this)
         web.webChromeClient = chrome
-        setContent { WebHubTheme { RunnerScreen() } }
+        setContent { GamehubTheme { RunnerScreen() } }
         handleIntent(intent)
     }
 
@@ -328,13 +328,13 @@ class RunnerActivity : ComponentActivity() {
             )
             web.stopLoading()
             web.webViewClient = client
-            web.removeJavascriptInterface(WebHubBridge.NAME)
-            web.addJavascriptInterface(WebHubBridge(this@RunnerActivity, app.id), WebHubBridge.NAME)
+            web.removeJavascriptInterface(GamehubBridge.NAME)
+            web.addJavascriptInterface(GamehubBridge(this@RunnerActivity, app.id), GamehubBridge.NAME)
             scriptHandler?.remove()
             scriptHandler = null
             if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
                 scriptHandler = WebViewCompat.addDocumentStartJavaScript(
-                    web, WebHubBridge.SHIM, setOf("https://${client.host}")
+                    web, GamehubBridge.SHIM, setOf("https://${client.host}")
                 )
             }
             web.clearHistory()
@@ -414,7 +414,7 @@ class RunnerActivity : ComponentActivity() {
     fun callOnShake() {
         evalJs(
             "(function(){try{if(typeof window.onShake==='function')window.onShake();" +
-                "window.dispatchEvent(new CustomEvent('webhub:shake'));}catch(e){}})()"
+                "window.dispatchEvent(new CustomEvent('gamehub:shake'));}catch(e){}})()"
         )
     }
 
@@ -437,12 +437,12 @@ class RunnerActivity : ComponentActivity() {
     }
 
     private fun saveToGallery(bmp: Bitmap) {
-        val name = "WebHub_${System.currentTimeMillis()}.png"
+        val name = "Gamehub_${System.currentTimeMillis()}.png"
         if (Build.VERSION.SDK_INT >= 29) {
             val cv = ContentValues().apply {
                 put(MediaStore.Images.Media.DISPLAY_NAME, name)
                 put(MediaStore.Images.Media.MIME_TYPE, "image/png")
-                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/WebHub")
+                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Gamehub")
             }
             val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv) ?: error("insert failed")
             contentResolver.openOutputStream(uri)!!.use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }

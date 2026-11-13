@@ -14,14 +14,14 @@
     <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="false" />
 
     <application
-        android:name=".WebHubApp"
+        android:name=".GamehubApp"
         android:allowBackup="false"
         android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.WebHub">
+        android:theme="@style/Theme.Gamehub">
 
         <activity
             android:name=".ui.MainActivity"

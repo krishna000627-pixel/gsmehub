@@ -1,4 +1,4 @@
-package com.krishna.webhub.web
+package com.krishna.gamehub.web
 
 import android.Manifest
 import android.app.NotificationChannel
@@ -16,16 +16,16 @@ import android.webkit.JavascriptInterface
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.krishna.webhub.R
-import com.krishna.webhub.core.CrashLog
-import com.krishna.webhub.core.Haptics
-import com.krishna.webhub.core.Torch
-import com.krishna.webhub.ui.RunnerActivity
+import com.krishna.gamehub.R
+import com.krishna.gamehub.core.CrashLog
+import com.krishna.gamehub.core.Haptics
+import com.krishna.gamehub.core.Torch
+import com.krishna.gamehub.ui.RunnerActivity
 import org.json.JSONArray
 import org.json.JSONObject
 
-/** Exposed as window.__WH. The page-facing API is window.WebHub (see SHIM). */
-class WebHubBridge(private val act: RunnerActivity, private val appId: String) {
+/** Exposed as window.__WH. The page-facing API is window.Gamehub (see SHIM). */
+class GamehubBridge(private val act: RunnerActivity, private val appId: String) {
     private val main = Handler(Looper.getMainLooper())
 
     private fun supported(): List<String> = buildList {
@@ -98,7 +98,7 @@ class WebHubBridge(private val act: RunnerActivity, private val appId: String) {
             }
             "clipboardSet" -> {
                 val cm = act.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                cm.setPrimaryClip(ClipData.newPlainText("WebHub", a.optString(0)))
+                cm.setPrimaryClip(ClipData.newPlainText("Gamehub", a.optString(0)))
                 resolve(cb, "true")
             }
             "saveFile" -> {
@@ -131,7 +131,7 @@ class WebHubBridge(private val act: RunnerActivity, private val appId: String) {
                 resolve(
                     cb,
                     JSONObject().put("id", appId).put("name", app?.name ?: "").put("version", app?.version ?: "")
-                        .put("webhub", "1.0.0").toString()
+                        .put("gamehub", "1.0.0").toString()
                 )
             }
             "openApp" -> act.openOtherApp(a.optString(0)) { ok ->
@@ -156,7 +156,7 @@ class WebHubBridge(private val act: RunnerActivity, private val appId: String) {
         )
         val n = NotificationCompat.Builder(act, CHANNEL)
             .setSmallIcon(R.drawable.ic_stat)
-            .setContentTitle(title.ifBlank { act.currentApp?.name ?: "WebHub" })
+            .setContentTitle(title.ifBlank { act.currentApp?.name ?: "Gamehub" })
             .setContentText(body)
             .setAutoCancel(true)
             .setContentIntent(open)
@@ -174,7 +174,7 @@ class WebHubBridge(private val act: RunnerActivity, private val appId: String) {
 
         val SHIM = """
 (function () {
-  if (window.WebHub || !window.__WH) return;
+  if (window.Gamehub || !window.__WH) return;
   var N = window.__WH, cbs = {}, seq = 0, sup = [];
   try { sup = JSON.parse(N.features()); } catch (e) {}
   window.__whResolve = function (id, ok, v) {
@@ -195,7 +195,7 @@ class WebHubBridge(private val act: RunnerActivity, private val appId: String) {
   sup.forEach(function (m) {
     api[m] = function () { return call(m, Array.prototype.slice.call(arguments)); };
   });
-  Object.defineProperty(window, 'WebHub', { value: Object.freeze(api), configurable: false });
+  Object.defineProperty(window, 'Gamehub', { value: Object.freeze(api), configurable: false });
 })();
 """.trimIndent()
     }

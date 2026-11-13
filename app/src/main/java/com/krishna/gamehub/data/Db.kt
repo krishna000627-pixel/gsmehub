@@ -1,4 +1,4 @@
-package com.krishna.webhub.data
+package com.krishna.gamehub.data
 
 import androidx.room.Dao
 import androidx.room.Database

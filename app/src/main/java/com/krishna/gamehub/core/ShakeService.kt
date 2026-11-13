@@ -1,4 +1,4 @@
-package com.krishna.webhub.core
+package com.krishna.gamehub.core
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -14,9 +14,9 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
-import com.krishna.webhub.R
-import com.krishna.webhub.data.Prefs
-import com.krishna.webhub.ui.MainActivity
+import com.krishna.gamehub.R
+import com.krishna.gamehub.data.Prefs
+import com.krishna.gamehub.ui.MainActivity
 
 class ShakeService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
@@ -51,7 +51,7 @@ class ShakeService : Service() {
         return NotificationCompat.Builder(this, CHANNEL)
             .setSmallIcon(R.drawable.ic_stat)
             .setContentTitle("Shake is on")
-            .setContentText("WebHub is listening for shakes")
+            .setContentText("Gamehub is listening for shakes")
             .setContentIntent(open)
             .setOngoing(true)
             .setSilent(true)
@@ -63,7 +63,7 @@ class ShakeService : Service() {
     companion object {
         const val CHANNEL = "shake_service"
         const val NOTIF_ID = 4201
-        const val ACTION_STOP = "com.krishna.webhub.STOP_SHAKE"
+        const val ACTION_STOP = "com.krishna.gamehub.STOP_SHAKE"
 
         fun ensureChannel(ctx: Context) {
             val nm = ctx.getSystemService(NotificationManager::class.java)

@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 
-package com.krishna.webhub.ui
+package com.krishna.gamehub.ui
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -89,7 +89,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.krishna.webhub.data.AppEntity
+import com.krishna.gamehub.data.AppEntity
 
 @Composable
 fun LibraryScreen(vm: MainViewModel, onDetail: (String) -> Unit, bottomSpace: Dp) {

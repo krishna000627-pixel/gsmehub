@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.krishna.webhub.ui
+package com.krishna.gamehub.ui
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -50,7 +50,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.krishna.webhub.core.Actions
+import com.krishna.gamehub.core.Actions
 
 @Composable
 fun AppDetailScreen(id: String, vm: MainViewModel, onBack: () -> Unit) {
